@@ -1,6 +1,5 @@
 // @flow
 
-import fs from "fs-extra";
 import stringify from "json-stable-stringify";
 import {join as pathJoin} from "path";
 import {sum} from "d3-array";
@@ -9,6 +8,8 @@ import {format} from "d3-format";
 import sortBy from "../util/sortBy";
 import {credrank} from "../core/credrank/compute";
 import {CredGraph, type Participant} from "../core/credrank/credGraph";
+import {DiskStorage} from "../core/storage/disk";
+import {encode} from "../core/storage/textEncoding";
 import {LoggingTaskReporter} from "../util/taskReporter";
 import {computeBonusMinting, createBonusGraph} from "../core/bonusMinting";
 import type {Command} from "./command";
@@ -52,6 +53,7 @@ const credrankCommand: Command = async (args, std) => {
   taskReporter.start("credrank");
 
   const baseDir = process.cwd();
+  const diskStorage = new DiskStorage(process.cwd());
   const config = await loadInstanceConfig(baseDir);
 
   taskReporter.start("load data");
@@ -87,9 +89,9 @@ const credrankCommand: Command = async (args, std) => {
 
   if (!isSimulation) {
     taskReporter.start("write cred graph");
-    const cgJson = stringify(credGraph.toJSON());
-    const outputPath = pathJoin(baseDir, "output", "credGraph.json");
-    await fs.writeFile(outputPath, cgJson);
+    const cgJson: Uint8Array = encode(stringify(credGraph.toJSON()));
+    const outputPath = pathJoin("output", "credGraph.json");
+    await diskStorage.set(outputPath, cgJson);
     taskReporter.finish("write cred graph");
   }
 
