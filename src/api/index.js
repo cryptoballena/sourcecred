@@ -30,6 +30,7 @@ import * as ledger from "../core/ledger/ledger";
 import * as ledgerUtils from "../core/ledger/utils";
 import * as grain from "../core/ledger/grain";
 import * as identity from "../core/identity";
+import * as textEncoding from "../core/storage/textEncoding";
 
 import * as manager from "./ledgerManager";
 import * as storage from "./ledgerStorage";
@@ -42,6 +43,7 @@ const api = {
       graphToMarkovChain,
     },
     graph,
+    textEncoding,
     weightedGraph,
     weights,
   },
